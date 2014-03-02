@@ -1,0 +1,280 @@
+
+<html><head><style>
+
+*{
+padding: 0px;
+margin: 0px;
+}
+
+body{
+background-color: #222222;
+}
+
+#canvas{
+background-color: #000000;
+position: absolute;
+
+}
+
+</style> </head><body>
+<canvas id="canvas"> </canvas> 
+
+<script>
+var a=[];
+var can=document.getElementById('canvas');
+var ctx=can.getContext('2d');
+
+can.style.left =0*window.innerWidth;
+can.style.top =0*window.innerHeight;
+can.height=1*window.innerHeight;
+can.width=1*window.innerWidth;
+
+var x=0.5*can.width;
+var y=0.5*can.height;
+
+var radius=180;
+var xp=x+radius;
+var yp=y;
+var theta=1000*Math.PI;
+var keys = [];
+
+
+ function rotate(){
+
+ if(keys[37]){
+
+  theta-=0.06; 
+
+}
+
+if(keys[39]){
+  
+  theta+=0.06;
+}
+
+     ctx.beginPath(); ctx.fillStyle="rgba(40,30,20,0.4)";
+     ctx.fillRect(0, 0, can.width, can.height);
+
+     ctx.beginPath();
+     ctx.arc(x,y,radius,0,Math.PI*2); ctx.strokeStyle='grey'; ctx.lineWidth=1; ctx.stroke();
+
+     ctx.beginPath();
+     ctx.arc(x,y,radius,theta,Math.PI/3+theta); ctx.strokeStyle='rgba(255,255,255,1)'; ctx.lineWidth=10; ctx.stroke();
+     
+     ctx.beginPath();
+     ctx.arc(x,y,radius,2*Math.PI/3+theta,Math.PI+theta); ctx.strokeStyle='rgba(0,255,0,1)'; ctx.lineWidth=10;  
+     ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.lineWidth=10;
+    ctx.arc(x,y,radius,4*Math.PI/3+theta,5/3*Math.PI+theta); ctx.strokeStyle='orange';  
+    ctx.stroke();
+    
+    //ctx.beginPath();
+    //ctx.arc(x,y,20,0,Math.PI*2); ctx.fillStyle='blue'; ctx.fill();
+
+
+
+requestAnimationFrame(rotate);
+}
+rotate();
+
+document.addEventListener("keydown",function(k){
+ keys[k.keyCode]=true;
+
+});
+
+document.addEventListener("keyup",function(k){
+
+ keys[k.keyCode]=false;
+});
+
+
+
+
+
+
+var W = can.width; var H=can.height;
+
+
+var evils = [];
+for(var i = 0; i <2; i++)
+{
+
+	evils.push(new create_evils());
+ 
+}
+
+
+
+function create_evils()
+{
+
+	this.xt =Math.floor(Math.random()*W/4);
+	this.yt = Math.floor(Math.random()*H);
+	this.flag=0;
+
+	this.vx =Math.floor( Math.random()*3)+0.2;
+	this.vy =Math.floor( Math.random()*3)+0.2;
+	
+
+	var r = Math.random()*255>>0;
+	var g = Math.random()*255>>0;
+	var b = Math.random()*255>>0;
+	this.color = "rgba("+r+", "+g+", "+b+", 0.5)";
+
+	this.radiust = Math.random()*20+20;
+
+}
+
+
+var slope,angle,alpha;
+function draw()
+{       
+  	
+
+	for(var t = 0; t < evils.length; t++)
+	{
+		var p = evils[t];
+
+		ctx.beginPath();
+	      	
+
+		var gradient = ctx.createRadialGradient(p.xt, p.yt, 0, p.xt, p.yt, p.radiust);
+		gradient.addColorStop(0, "white");
+		gradient.addColorStop(0.4, "red");
+		gradient.addColorStop(0.4, p.color);
+		gradient.addColorStop(1, "black");
+		
+		ctx.fillStyle = gradient; 
+
+		ctx.arc(p.xt, p.yt, p.radiust, Math.PI*2, false);
+		ctx.fill();
+		
+
+		p.xt =p.xt+ 2*p.vx;
+		p.yt += p.vy;
+
+
+		if(p.xt < -50) p.xt = W+50;
+		if(p.yt < -50) p.yt = H+50;
+		if(p.xt > W+50) p.xt = -50;
+		if(p.yt > H+50) p.yt = -50;
+
+slope=(p.yt-y/p.xt-x); angle=Math.atan(Math.abs(slope));
+
+if(p.vx<0){
+var lt=Math.sqrt((x-p.xt)*(x-p.xt)+(y-p.yt)*(y-p.yt));
+if(lt<radius+p.radiust) { 
+
+var at=Math.atan((p.yt-y)/(p.xt-x));
+//if(p.xt<x)at+=Math.PI;
+if(p.xt>x && p.yt<y) at+=2*Math.PI;
+var st=theta%(2*Math.PI);
+var rt=Math.atan(p.radiust/lt);
+at=at-rt; bt=at+rt;
+//if((st>Math.PI/3 && st<Math.PI*2/3) || (st>Math.PI && st<Math.PI*4/3) (st>Math.PI*5/3 && st<Math.PI*2))
+if((at>st && at<st+Math.PI/3) || (bt>st && bt<st+Math.PI/3) || (at>st+Math.PI*2/3 && at<st+Math.PI ) || (bt>st+Math.PI*2/3 && bt<st+Math.PI) || (at>st+Math.PI*4/3 && at<st+Math.PI*5/3) || (bt>st+Math.PI*4/3 && bt<st+Math.PI*5/3)){
+
+p.vx*=-1;
+p.vy*=-1;
+
+ }
+else{
+
+p.vx=1000;p.vy=1000;
+}
+}
+}
+
+else{ 
+var lt=Math.sqrt((x-p.xt)*(x-p.xt)+(y-p.yt)*(y-p.yt));
+if(lt<radius+p.radiust) { 
+
+var at=Math.atan((p.yt-y)/(p.xt-x));
+if(p.xt<x)at+=Math.PI;
+//if(p.xt>x && p.yt<y) at+=2*Math.PI;
+var st=theta%(2*Math.PI);
+var rt=Math.atan(p.radiust/lt);
+at=at-rt; bt=at+rt;
+//if((st>Math.PI/3 && st<Math.PI*2/3) || (st>Math.PI && st<Math.PI*4/3) (st>Math.PI*5/3 && st<Math.PI*2))
+if((at>st && at<st+Math.PI/3) || (bt>st && bt<st+Math.PI/3) || (at>st+Math.PI*2/3 && at<st+Math.PI ) || (bt>st+Math.PI*2/3 && bt<st+Math.PI) || (at>st+Math.PI*4/3 && at<st+Math.PI*5/3) || (bt>st+Math.PI*4/3 && bt<st+Math.PI*5/3)){
+
+p.vx*=-1;
+p.vy*=-1;
+
+
+ }
+else{
+
+p.vx=1000;p.vy=1000;
+}
+}
+}
+
+
+
+}
+
+requestAnimationFrame(draw)
+}
+
+
+draw();
+
+
+var golds =[];
+for(var i=0;i<7;i++)
+{
+  golds.push(new create_golds());
+
+}
+
+var imgGold=new Image(); imgGold.src='India.gif';
+function create_golds(){
+
+ this.xcod=Math.floor(Math.random()*1000);
+ this.ycod=Math.floor(Math.random()*500);
+ this.radGold=Math.floor(Math.random()*15)+3;
+ this.color="green";
+ this.point=2*this.radGold;
+}
+var pg;
+function draw_golds(){
+  for(var t=0;t<golds.length;t++){
+  pg=golds[t];
+  ctx.beginPath();
+  ctx.fillRect(pg.xcod,pg.ycod,50,50);
+  ctx.drawImage(imgGold,pg.xcod,pg.ycod);
+  //ctx.fillStyle='yellow'; ctx.fill();
+
+
+
+}
+requestAnimationFrame(draw_golds);
+
+}
+draw_golds();
+var xhero=x; var yhero=y; var imgHero=new Image(); imgHero.src='hero.png';
+function move_hero(){
+ if(keys[65])
+ xhero-=3;
+ if(keys[83])
+ yhero+=3;
+  if(keys[68])
+ xhero+=3
+ if(keys[87])
+ yhero-=3;
+
+ctx.beginPath();
+ctx.fillRect(xhero,yhero,50,50);
+ctx.drawImage(imgHero,xhero,yhero);
+//ctx.fillStyle='red';
+//ctx.fill();
+//if(xhero>pg.xcod && xhero<pg.xcod+50 && yhero>pg.ycod && yhero<pg.ycod+50)
+//alert('heheh');
+
+requestAnimationFrame(move_hero);
+}
+move_hero();
+</script> 
